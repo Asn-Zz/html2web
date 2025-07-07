@@ -11,6 +11,7 @@ export interface FileItem {
 }
 
 export interface COSSettings {
+  token?: string
   secretId: string
   secretKey: string
   bucket: string

@@ -12,9 +12,10 @@ interface SettingsDialogProps {
   onSettingsChange: (settings: COSSettings) => void
   onSave: () => void
   onTestConnection: () => void
+  onFillPassword: () => void
 }
 
-export function SettingsDialog({ isOpen, onOpenChange, settings, onSettingsChange, onSave, onTestConnection }: SettingsDialogProps) {
+export function SettingsDialog({ isOpen, onOpenChange, settings, onSettingsChange, onSave, onTestConnection, onFillPassword }: SettingsDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -23,12 +24,19 @@ export function SettingsDialog({ isOpen, onOpenChange, settings, onSettingsChang
         </DialogHeader>
         <div className="space-y-4">
           <div>
+            <Label htmlFor="secretId">访问密码</Label>
+            <div className="flex space-x-2">
+              <Input id="secretKey" type="password" value={settings.token} onChange={(e) => onSettingsChange({ ...settings, token: e.target.value })} placeholder="请输入访问密码" className="flex-1" />
+              <Button onClick={onFillPassword} variant="outline" className="bg-transparent">一键填充</Button>
+            </div>
+          </div>
+          <div>
             <Label htmlFor="secretId">SecretId</Label>
             <Input id="secretId" value={settings.secretId} onChange={(e) => onSettingsChange({ ...settings, secretId: e.target.value })} placeholder="请输入SecretId" />
           </div>
           <div>
             <Label htmlFor="secretKey">SecretKey</Label>
-            <Input id="secretKey" type="password" value={settings.secretKey} onChange={(e) => onSettingsChange({ ...settings, secretKey: e.target.value })} placeholder="请输入SecretKey" />
+            <Input id="secretKey" type="password" value={settings.secretKey} onChange={(e) => onSettingsChange({ ...settings, secretKey: e.target.value })} placeholder="请输入SecretKey" className="flex-1" />
           </div>
           <div>
             <Label htmlFor="bucket">存储桶名称</Label>

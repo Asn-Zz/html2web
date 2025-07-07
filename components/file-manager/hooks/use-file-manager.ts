@@ -29,6 +29,7 @@ export function useFileManager() {
     secretKey: "",
     bucket: "",
     region: "",
+    token: ""
   })
 
   const { toast } = useToast()
@@ -49,9 +50,9 @@ export function useFileManager() {
     [toast]
   )
 
-  // Load settings from localStorage and initialize COS
   useEffect(() => {
     const savedSettings = localStorage.getItem("cosSettings")
+
     if (savedSettings) {
       try {
         const parsed = JSON.parse(savedSettings)
@@ -257,6 +258,21 @@ export function useFileManager() {
     if (cosService) await loadFiles(cosService, path)
   }
 
+  const handleFillPassword = () => {    
+    if (settings.token === process.env.NEXT_PUBLIC_TOKEN) {
+      setSettings((prev) => ({ 
+        ...prev, 
+        secretId: process.env.NEXT_PUBLIC_COS_SECRET_ID || "",
+        secretKey: process.env.NEXT_PUBLIC_COS_SECRET_KEY || "",
+        bucket: process.env.NEXT_PUBLIC_COS_BUCKET || "",
+        region: process.env.NEXT_PUBLIC_COS_REGION || "",
+        token: process.env.NEXT_PUBLIC_TOKEN || ""
+      }))
+    } else {      
+      toast({ title: "权限验证失败", description: "请输入正确的权限令牌", variant: "destructive" })
+    }
+  }
+
   return {
     files,
     currentPath,
@@ -299,5 +315,6 @@ export function useFileManager() {
     saveSettings,
     testConnection,
     navigateToPath,
+    handleFillPassword,
   }
 }

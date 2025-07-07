@@ -89,6 +89,7 @@ export function FileManager() {
         onSettingsChange={hook.setSettings}
         onSave={hook.saveSettings}
         onTestConnection={hook.testConnection}
+        onFillPassword={hook.handleFillPassword}
       />
 
       <FileDetailDialog
