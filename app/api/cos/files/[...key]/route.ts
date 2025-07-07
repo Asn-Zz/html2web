@@ -19,11 +19,14 @@ function getKeyFromParams(request: NextRequest): string {
  */
 async function getHandler(request: NextRequest) {
   const key = getKeyFromParams(request);
-  const isListingRequest = key === 'all';  
+  if (!key) {
+    return NextResponse.json({ error: 'A key is required to create a resource.' }, { status: 400 });
+  }
+  const isListingRequest = !key.includes('/');  
 
   try {
     if (isListingRequest) {
-      const result = await cosService.listFiles('');
+      const result = await cosService.listFiles(key === 'all' ? '' : key);
       return NextResponse.json(result);
     } else {
       // Use the new service method to get the file payload
@@ -56,7 +59,7 @@ async function postHandler(request: NextRequest) {
     return NextResponse.json({ error: 'A key is required to create a resource.' }, { status: 400 });
   }
 
-  const isFolderCreation = key && !key.includes('/');
+  const isFolderCreation = !key.includes('/');
 
   try {
     if (isFolderCreation) {
@@ -88,7 +91,7 @@ async function deleteHandler(request: NextRequest) {
     return NextResponse.json({ error: 'A key is required to delete a resource.' }, { status: 400 });
   }
 
-  const isFolderDeletion = key && !key.includes('/');
+  const isFolderDeletion = !key.includes('/');
 
   try {
     if (isFolderDeletion) {
