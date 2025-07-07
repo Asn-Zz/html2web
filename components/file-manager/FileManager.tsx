@@ -106,6 +106,7 @@ export function FileManager() {
         isOpen={hook.showShare}
         onOpenChange={hook.setShowShare}
         shareUrl={hook.shareUrl}
+        fileKey={hook.selectedFile?.key}
       />
     </div>
   )

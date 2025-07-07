@@ -190,6 +190,7 @@ export function useFileManager() {
       return
     }
     setShareUrl(item.url)
+    setSelectedFile(item) // 设置选中的文件，以便在ShareDialog中获取fileKey
     setShowShare(true)
   }
 
