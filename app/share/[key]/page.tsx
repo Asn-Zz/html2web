@@ -63,6 +63,7 @@ export default function SharePage() {
         if (parsed.secretId && parsed.secretKey && parsed.bucket && parsed.region) {
           const service = new COSService(parsed)
           setCosService(service)
+          setIsVisitor(false)
         } else {
           setError('COS配置不完整，以游客模式预览。')
           fetchContentAsGuest();
@@ -91,6 +92,7 @@ export default function SharePage() {
       .then(data => { 
         setContent(data)
         setEditedContent(data)
+        setIsVisitor(true)
       })
       .catch(error => {
         console.error('Failed to load file content as guest:', error)
@@ -102,9 +104,9 @@ export default function SharePage() {
   }
 
   const toggleVisitor = () => {
-    setIsVisitor(!isVisitor)
     setContent('')
     setEditedContent('')
+    setIsVisitor(!isVisitor)
 
     if (isVisitor) {
       fetchContentAsGuest()
