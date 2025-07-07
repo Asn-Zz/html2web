@@ -106,12 +106,11 @@ export default function SharePage() {
   const toggleVisitor = () => {
     setContent('')
     setEditedContent('')
-    setIsVisitor(!isVisitor)
 
     if (isVisitor) {
-      fetchContentAsGuest()
-    } else {
       initServer()
+    } else {
+      fetchContentAsGuest()
     }
   }
 
