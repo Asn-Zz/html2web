@@ -9,27 +9,30 @@ import { cosService, withAuth } from '@/lib/cos';
 function getKeyFromParams(request: NextRequest): string {
   const url = new URL(request.url);
   const pathSegments = url.pathname.split('/api/cos/files/');
+  // If the key is empty (root), we return an empty string.
   return pathSegments[1] || '';
 }
 
 /**
  * GET /api/cos/files/[...key]
- * - If key is a folder (ends with /) or empty, lists contents.
- * - If key is a file, downloads the file.
+ * - To list contents: ?type=folder
+ * - To download a file: ?type=file (or omit type)
  */
 async function getHandler(request: NextRequest) {
   const key = getKeyFromParams(request);
-  if (!key) {
-    return NextResponse.json({ error: 'A key is required to create a resource.' }, { status: 400 });
-  }
-  const isListingRequest = !key.includes('/');  
+  // CHANGE: Determine action based on 'type' query parameter, not the key's content.
+  const type = request.nextUrl.searchParams.get('type');
 
   try {
-    if (isListingRequest) {
-      const result = await cosService.listFiles(key === 'all' ? '' : key);
+    if (type === 'folder') {
+      // List contents of the given key (prefix). An empty key lists the root.
+      const result = await cosService.listFiles(key);
       return NextResponse.json(result);
     } else {
-      // Use the new service method to get the file payload
+      // Default action is to get a file.
+      if (!key) {
+        return NextResponse.json({ error: 'A key is required to download a file.' }, { status: 400 });
+      }
       const { body, contentType } = await cosService.getFilePayload(key);
       const fileName = key.split('/').pop() || 'download';
       
@@ -37,7 +40,6 @@ async function getHandler(request: NextRequest) {
       headers.set('Content-Type', contentType);
       headers.set('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`);
 
-      // NextResponse can be constructed directly from a Buffer
       return new NextResponse(body, { status: 200, headers });
     }
   } catch (error: any) {
@@ -50,23 +52,23 @@ async function getHandler(request: NextRequest) {
 
 /**
  * POST /api/cos/files/[...key]
- * - If key ends with /, creates a new folder.
- * - If key is a file path, uploads a file (from request body).
+ * - To create a folder: ?type=folder
+ * - To upload a file: ?type=file (or omit type)
  */
 async function postHandler(request: NextRequest) {
   const key = getKeyFromParams(request);
   if (!key) {
     return NextResponse.json({ error: 'A key is required to create a resource.' }, { status: 400 });
   }
-
-  const isFolderCreation = !key.includes('/');
+  // CHANGE: Determine action based on 'type' query parameter.
+  const type = request.nextUrl.searchParams.get('type');
 
   try {
-    if (isFolderCreation) {
+    if (type === 'folder') {
       await cosService.createFolder(key);
       return NextResponse.json({ message: `Folder '${key}' created successfully.` }, { status: 201 });
     } else {
-      // Convert the incoming request body to a Buffer
+      // Default action is to upload a file.
       const arrayBuffer = await request.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
 
@@ -83,21 +85,23 @@ async function postHandler(request: NextRequest) {
 
 /**
  * DELETE /api/cos/files/[...key]
- * - Deletes a file or an entire folder.
+ * - To delete a folder: ?type=folder
+ * - To delete a file: ?type=file (or omit type)
  */
 async function deleteHandler(request: NextRequest) {
   const key = getKeyFromParams(request);
   if (!key) {
     return NextResponse.json({ error: 'A key is required to delete a resource.' }, { status: 400 });
   }
-
-  const isFolderDeletion = !key.includes('/');
+  // CHANGE: Determine action based on 'type' query parameter.
+  const type = request.nextUrl.searchParams.get('type');
 
   try {
-    if (isFolderDeletion) {
+    if (type === 'folder') {
       await cosService.deleteFolder(key);
       return NextResponse.json({ message: `Folder '${key}' and its contents deleted successfully.` });
     } else {
+      // Default action is to delete a file.
       await cosService.deleteFile(key);
       return NextResponse.json({ message: `File '${key}' deleted successfully.` });
     }
