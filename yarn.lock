@@ -1064,6 +1064,11 @@
   dependencies:
     undici-types "~6.21.0"
 
+"@types/prismjs@^1.26.5":
+  version "1.26.5"
+  resolved "https://registry.npmmirror.com/@types/prismjs/-/prismjs-1.26.5.tgz#72499abbb4c4ec9982446509d2f14fb8483869d6"
+  integrity sha512-AUZTa7hQ2KY5L7AmtSiqxlhWxb4ina0yd8hNbl4TWuqnv/pFP0nDMb3YrfSBf4hJVGLh2YEIBfKaBW/9UEl6IQ==
+
 "@types/qrcode@^1.5.5":
   version "1.5.5"
   resolved "https://registry.npmmirror.com/@types/qrcode/-/qrcode-1.5.5.tgz#993ff7c6b584277eee7aac0a20861eab682f9dac"
@@ -2363,6 +2368,11 @@ postcss@^8.4.47, postcss@^8.5:
     picocolors "^1.1.1"
     source-map-js "^1.2.1"
 
+prismjs@^1.30.0:
+  version "1.30.0"
+  resolved "https://registry.npmmirror.com/prismjs/-/prismjs-1.30.0.tgz#d9709969d9d4e16403f6f348c63553b19f0975a9"
+  integrity sha512-DEvV2ZF2r2/63V+tK8hQvrR2ZGn10srHbXviTlcv7Kpzw8jWiNTqbVgjO3IY8RxrrOUF8VPMQQFysYYYv0YZxw==
+
 prop-types@^15.6.2, prop-types@^15.8.1:
   version "15.8.1"
   resolved "https://registry.npmmirror.com/prop-types/-/prop-types-15.8.1.tgz#67d87bf1a694f48435cf332c24af10214a3140b5"
@@ -2460,6 +2470,11 @@ react-resizable-panels@^2.1.7:
   version "2.1.9"
   resolved "https://registry.npmmirror.com/react-resizable-panels/-/react-resizable-panels-2.1.9.tgz#874847710f4f122df749b5f08ebe9c72a1e338ca"
   integrity sha512-z77+X08YDIrgAes4jl8xhnUu1LNIRp4+E7cv4xHmLOxxUPO/ML7PSrE813b90vj7xvQ1lcf7g2uA9GeMZonjhQ==
+
+react-simple-code-editor@^0.14.1:
+  version "0.14.1"
+  resolved "https://registry.npmmirror.com/react-simple-code-editor/-/react-simple-code-editor-0.14.1.tgz#fd37eb3349f5def45900dd46acf296f796d81d2c"
+  integrity sha512-BR5DtNRy+AswWJECyA17qhUDvrrCZ6zXOCfkQY5zSmb96BVUbpVAv03WpcjcwtCwiLbIANx3gebHOcXYn1EHow==
 
 react-smooth@^4.0.0:
   version "4.0.4"

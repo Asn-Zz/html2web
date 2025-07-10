@@ -9,6 +9,13 @@ import { useToast } from '@/hooks/use-toast'
 import { COSService } from '@/lib/cos-service'
 import Link from 'next/link'
 
+// --- Syntax Highlighting Additions ---
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-markup';
+import 'prismjs/themes/prism-tomorrow.css'; // Editor theme
+// --- End of Additions ---
+
 const Spinner = () => (
   <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-gray-900"></div>
 );
@@ -43,7 +50,7 @@ export default function SharePage() {
       } else if (fileExtension === 'json') {
         mimeType = 'application/json'
       }
-      
+
       const contentToPreview = isEditing ? editedContent : content
       const blob = new Blob([contentToPreview], { type: mimeType })
       const url = URL.createObjectURL(blob)
@@ -73,7 +80,7 @@ export default function SharePage() {
         setError('COS设置加载失败，以游客模式预览。')
         fetchContentAsGuest();
       }
-    } else {      
+    } else {
       fetchContentAsGuest();
     }
   }
@@ -89,7 +96,7 @@ export default function SharePage() {
         }
         return response.text()
       })
-      .then(data => { 
+      .then(data => {
         setContent(data)
         setEditedContent(data)
         setIsVisitor(true)
@@ -122,7 +129,7 @@ export default function SharePage() {
       try {
         const fileContent = await cosService.getFileContent(key)
         setContent(fileContent)
-        setEditedContent(fileContent)        
+        setEditedContent(fileContent)
       } catch (error) {
         console.error('Failed to load file content:', error)
         setError(error instanceof Error ? error.message : '获取文件内容失败')
@@ -149,7 +156,7 @@ export default function SharePage() {
       } else if (fileExtension === 'json') {
         mimeType = 'application/json'
       }
-      
+
       const blob = new Blob([editedContent], { type: mimeType })
       await cosService.uploadFile(key, blob)
       setContent(editedContent)
@@ -164,7 +171,7 @@ export default function SharePage() {
   }
 
   const toggleEditMode = () => {
-    if (isEditing) {      
+    if (isEditing) {
       if (content !== editedContent) {
         const confirmSave = confirm('是否保存更改？')
         if (confirmSave) {
@@ -186,12 +193,12 @@ export default function SharePage() {
       }
     }
   }, [isLoading, content, refreshPreview])
-  
-  useEffect(() => {  
-    const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement;
-    if (!iframe) return;    
 
-    const handleLoad = () => {      
+  useEffect(() => {
+    const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement;
+    if (!iframe) return;
+
+    const handleLoad = () => {
       setIsIframeLoading(false);
     };
 
@@ -206,16 +213,32 @@ export default function SharePage() {
       const iframe = document.getElementById('preview-iframe') as HTMLIFrameElement
       if (iframe) {
         const viewportHeight = window.innerHeight
-        const headerHeight = 100
-        const marginHeight = 40
+        const headerHeight = isEditing ? 100 : 0
+        const marginHeight = isEditing ? 40 : 0
         iframe.style.height = `${viewportHeight - headerHeight - marginHeight}px`
       }
     }
-    
+
     handleResize()
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [isEditing])
+
+  const getPrismLanguage = (filename: string) => {
+    const extension = filename.split('.').pop()?.toLowerCase();
+    switch (extension) {
+      case 'html':
+        return { lang: 'markup', prismLang: languages.markup };
+      case 'js':
+        return { lang: 'javascript', prismLang: languages.javascript };
+      case 'css':
+        return { lang: 'css', prismLang: languages.css };
+      default:
+        return null;
+    }
+  };
+
+  const prismLangInfo = getPrismLanguage(key);
 
   if (isLoading) {
     return (
@@ -240,16 +263,16 @@ export default function SharePage() {
             </Button>
           </div>
         )}
-        <iframe 
+        <iframe
           id="preview-iframe"
-          className="w-full min-h-[100vh] border-0" 
-          title="预览" 
+          className="w-full min-h-[100vh] border-0"
+          title="预览"
           style={{ visibility: isIframeLoading ? 'hidden' : 'visible' }}
         />
       </div>
     )
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -295,13 +318,31 @@ export default function SharePage() {
           <>
             {isEditing ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="flex flex-col">
+                <div className="flex flex-col min-h-0">
                   <h2 className="font-medium mb-2">编辑器</h2>
-                  <Textarea 
-                    className="flex-1 font-mono text-sm resize-none min-h-[70vh]" 
-                    value={editedContent} 
-                    onChange={(e) => setEditedContent(e.target.value)} 
-                  />
+                  {prismLangInfo ? (
+                    <div className="relative border rounded-md bg-gray-900 text-white" style={{height: '85vh'}}>
+                      <Editor
+                        value={editedContent}
+                        onValueChange={setEditedContent}
+                        highlight={code => highlight(code, prismLangInfo.prismLang, prismLangInfo.lang)}
+                        padding={10}
+                        className="w-full h-full"
+                        style={{
+                          fontFamily: '"Fira code", "Fira Mono", monospace',
+                          fontSize: 14,
+                          outline: 'none',
+                          overflow: 'scroll'
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <Textarea
+                      className="flex-1 font-mono text-sm resize-none min-h-[70vh]"
+                      value={editedContent}
+                      onChange={(e) => setEditedContent(e.target.value)}
+                    />
+                  )}
                 </div>
                 <div className="flex flex-col">
                   <div className="flex justify-between items-center mb-2">
@@ -310,34 +351,31 @@ export default function SharePage() {
                       <RefreshCw className="w-4 h-4 mr-1" /> 刷新
                     </Button>
                   </div>
-                  {/* [MODIFIED] Add relative container for spinner positioning */}
                   <div className="relative flex-1 border border-gray-300 rounded-lg min-h-[70vh]">
                     {isIframeLoading && (
                       <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75 z-10 rounded-lg">
                         <Spinner />
                       </div>
                     )}
-                    <iframe 
+                    <iframe
                       id="preview-iframe"
-                      className="w-full h-full border-0 rounded-lg" 
-                      title="预览" 
+                      className="w-full h-full border-0 rounded-lg"
+                      title="预览"
                     />
                   </div>
                 </div>
               </div>
             ) : (
-              /* [MODIFIED] Add relative container for spinner positioning */
               <div className="relative bg-white rounded-lg shadow-sm overflow-hidden min-h-[80vh]">
                 {isIframeLoading && (
                   <div className="absolute inset-0 flex items-center justify-center bg-white z-10">
                     <Spinner />
                   </div>
                 )}
-                <iframe 
+                <iframe
                   id="preview-iframe"
-                  className="w-full border-0 min-h-[80vh]" 
-                  title="预览" 
-                  // Hide iframe while loading to prevent flash of old content
+                  className="w-full border-0 min-h-[80vh]"
+                  title="预览"
                   style={{ visibility: isIframeLoading ? 'hidden' : 'visible' }}
                 />
               </div>

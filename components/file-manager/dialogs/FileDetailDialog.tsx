@@ -6,6 +6,13 @@ import { Download, File, RefreshCw, Save, Share2 } from "lucide-react"
 import type { FileItem } from "../types"
 import { formatFileSize, getFileType } from "../utils"
 
+// --- Syntax Highlighting Additions ---
+import Editor from 'react-simple-code-editor';
+import { highlight, languages } from 'prismjs/components/prism-core';
+import 'prismjs/components/prism-markup';     // For HTML, XML, etc.
+import 'prismjs/themes/prism-tomorrow.css';    // A nice dark theme for the editor
+// --- End of Additions ---
+
 interface FileDetailDialogProps {
   isOpen: boolean
   onOpenChange: (isOpen: boolean) => void
@@ -25,18 +32,25 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
       const blob = new Blob([editedContent], { type: "text/html" })
       const url = URL.createObjectURL(blob)
       previewRef.current.src = url
-      return () => URL.revokeObjectURL(url)
+      // It's good practice to revoke the URL when the component unmounts or the URL changes,
+      // but in this short-lived context, it's less critical.
+      // For robustness, you might manage and revoke old URLs.
     }
   }, [editedContent, selectedFile])
 
   useEffect(() => {
     if (isOpen && selectedFile && getFileType(selectedFile.name) === "html") {
+      // Initial load
+      refreshPreview()
+      // Debounced refresh on edit
       const timeoutId = setTimeout(refreshPreview, 300)
       return () => clearTimeout(timeoutId)
     }
   }, [isOpen, editedContent, selectedFile, refreshPreview])
 
   if (!selectedFile) return null
+
+  const fileType = getFileType(selectedFile.name)
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -53,20 +67,50 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
               <Button size="sm" variant="outline" onClick={() => onShare(selectedFile)}><Share2 className="w-4 h-4 mr-1" />分享</Button>
             </div>
           </div>
-          { (getFileType(selectedFile.name) === "html" || getFileType(selectedFile.name) === "text") && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1">
-              <div className="flex flex-col"><h4 className="font-medium mb-2">编辑器</h4><Textarea className="flex-1 font-mono text-sm resize-none" value={editedContent} onChange={(e) => onContentChange(e.target.value)} /></div>
+          {(fileType === "html" || fileType === "text") && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+              <div className="flex flex-col min-h-0">
+                <h4 className="font-medium mb-2">编辑器</h4>
+                {fileType === "html" ? (
+                  <div className="relative h-0 flex-1 border rounded-md bg-gray-900 text-white">
+                    <Editor
+                      value={editedContent}
+                      onValueChange={onContentChange}
+                      highlight={code => highlight(code, languages.markup, 'markup')}
+                      padding={10}
+                      className="w-full h-full overflow-auto"
+                      style={{
+                        fontFamily: '"Fira code", "Fira Mono", monospace',
+                        fontSize: 14,
+                        outline: 'none',
+                        overflow: 'scroll'
+                      }}
+                    />
+                  </div>
+                ) : (
+                  <Textarea className="flex-1 font-mono text-sm resize-none" value={editedContent} onChange={(e) => onContentChange(e.target.value)} />
+                )}
+              </div>
               <div className="flex flex-col">
-                <div className="flex justify-between items-center mb-2"><h4 className="font-medium">预览</h4>{getFileType(selectedFile.name) === "html" && <Button size="sm" variant="outline" onClick={refreshPreview}><RefreshCw className="w-4 h-4 mr-1" />刷新</Button>}</div>
-                {getFileType(selectedFile.name) === "html" ? <iframe ref={previewRef} className="flex-1 border border-gray-300 rounded-lg" title="预览" /> : <div className="flex-1 bg-gray-100 border border-gray-300 rounded-lg p-4"><p className="text-gray-500">纯文本文件无预览。</p></div>}
+                <div className="flex justify-between items-center mb-2">
+                  <h4 className="font-medium">预览</h4>
+                  {fileType === "html" && <Button size="sm" variant="outline" onClick={refreshPreview}><RefreshCw className="w-4 h-4 mr-1" />刷新</Button>}
+                </div>
+                {fileType === "html" ? (
+                  <iframe ref={previewRef} className="flex-1 border border-gray-300 rounded-lg" title="预览" />
+                ) : (
+                  <div className="flex-1 bg-gray-100 border border-gray-300 rounded-lg p-4 flex items-center justify-center">
+                    <p className="text-gray-500">纯文本文件无预览。</p>
+                  </div>
+                )}
               </div>
             </div>
           )}
-          { getFileType(selectedFile.name) === "image" && (
+          {fileType === "image" && (
             <div className="flex-1 flex flex-col"><h4 className="font-medium mb-2">图片预览</h4><div className="flex-1 flex justify-center items-center bg-gray-100 rounded-lg p-4"><img src={selectedFile.url || "/placeholder.svg"} alt={selectedFile.name} className="max-w-full max-h-full object-contain rounded-lg shadow-md" /></div></div>
           )}
-          { getFileType(selectedFile.name) === "other" && (
-            <div className="flex-1 flex flex-col"><h4 className="font-medium mb-2">文件信息</h4><div className="flex-1 bg-gray-100 rounded-lg p-8 text-center"><File className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-lg text-gray-700 mb-2">此文件类型不支持在线预览。</p><p className="text-sm text-gray-500">文件名: {selectedFile.name}</p><p className="text-sm text-gray-500">大小: {formatFileSize(selectedFile.size)}</p><p className="text-sm text-gray-500">创建时间: {selectedFile.created.toLocaleString()}</p></div></div>
+          {fileType === "other" && (
+            <div className="flex-1 flex flex-col"><h4 className="font-medium mb-2">文件信息</h4><div className="flex-1 bg-gray-100 rounded-lg p-8 text-center flex flex-col justify-center items-center"><File className="w-16 h-16 text-gray-400 mx-auto mb-4" /><p className="text-lg text-gray-700 mb-2">此文件类型不支持在线预览。</p><p className="text-sm text-gray-500">文件名: {selectedFile.name}</p><p className="text-sm text-gray-500">大小: {formatFileSize(selectedFile.size)}</p><p className="text-sm text-gray-500">创建时间: {selectedFile.created.toLocaleString()}</p></div></div>
           )}
         </div>
       </DialogContent>
