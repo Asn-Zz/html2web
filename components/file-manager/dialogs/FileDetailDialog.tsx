@@ -9,8 +9,11 @@ import { formatFileSize, getFileType } from "../utils"
 // --- Syntax Highlighting Additions ---
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-markup';     // For HTML, XML, etc.
-import 'prismjs/themes/prism-tomorrow.css';    // A nice dark theme for the editor
+import 'prismjs/components/prism-clike';      // Dependency for javascript
+import 'prismjs/components/prism-markup';     // For HTML
+import 'prismjs/components/prism-javascript'; // For <script> tags
+import 'prismjs/components/prism-css';        // For <style> tags
+import 'prismjs/themes/prism-tomorrow.css';   // Or your theme of choice
 // --- End of Additions ---
 
 interface FileDetailDialogProps {
@@ -72,20 +75,21 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
               <div className="flex flex-col min-h-0">
                 <h4 className="font-medium mb-2">编辑器</h4>
                 {fileType === "html" ? (
-                  <div className="relative h-0 flex-1 border rounded-md bg-gray-900 text-white">
-                    <Editor
-                      value={editedContent}
-                      onValueChange={onContentChange}
-                      highlight={code => highlight(code, languages.markup, 'markup')}
-                      padding={10}
-                      className="w-full h-full overflow-auto"
-                      style={{
-                        fontFamily: '"Fira code", "Fira Mono", monospace',
-                        fontSize: 14,
-                        outline: 'none',
-                        overflow: 'scroll'
-                      }}
-                    />
+                  <div className="overflow-y-auto border rounded-md">
+                    <div className="relative bg-gray-900 text-white">
+                      <Editor
+                        value={editedContent}
+                        onValueChange={onContentChange}
+                        highlight={code => highlight(code, languages.markup, 'markup')}
+                        padding={10}
+                        className="w-full h-full"
+                        style={{
+                          fontFamily: '"Fira code", "Fira Mono", monospace',
+                          fontSize: 14,
+                          outline: 'none',
+                        }}
+                      />
+                    </div>
                   </div>
                 ) : (
                   <Textarea className="flex-1 font-mono text-sm resize-none" value={editedContent} onChange={(e) => onContentChange(e.target.value)} />
@@ -94,7 +98,7 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
               <div className="flex flex-col">
                 <div className="flex justify-between items-center mb-2">
                   <h4 className="font-medium">预览</h4>
-                  {fileType === "html" && <Button size="sm" variant="outline" onClick={refreshPreview}><RefreshCw className="w-4 h-4 mr-1" />刷新</Button>}
+                  {fileType === "html" && <RefreshCw className="w-4 h-4 cursor-pointer" onClick={refreshPreview} />}
                 </div>
                 {fileType === "html" ? (
                   <iframe ref={previewRef} className="flex-1 border border-gray-300 rounded-lg" title="预览" />

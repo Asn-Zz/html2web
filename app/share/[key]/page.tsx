@@ -12,8 +12,11 @@ import Link from 'next/link'
 // --- Syntax Highlighting Additions ---
 import Editor from 'react-simple-code-editor';
 import { highlight, languages } from 'prismjs/components/prism-core';
-import 'prismjs/components/prism-markup';
-import 'prismjs/themes/prism-tomorrow.css'; // Editor theme
+import 'prismjs/components/prism-clike';      // Dependency for javascript
+import 'prismjs/components/prism-markup';     // For HTML
+import 'prismjs/components/prism-javascript'; // For <script> tags
+import 'prismjs/components/prism-css';        // For <style> tags
+import 'prismjs/themes/prism-tomorrow.css';   // Or your theme of choice
 // --- End of Additions ---
 
 const Spinner = () => (
@@ -321,20 +324,22 @@ export default function SharePage() {
                 <div className="flex flex-col min-h-0">
                   <h2 className="font-medium mb-2">编辑器</h2>
                   {prismLangInfo ? (
-                    <div className="relative border rounded-md bg-gray-900 text-white" style={{height: '85vh'}}>
-                      <Editor
-                        value={editedContent}
-                        onValueChange={setEditedContent}
-                        highlight={code => highlight(code, prismLangInfo.prismLang, prismLangInfo.lang)}
-                        padding={10}
-                        className="w-full h-full"
-                        style={{
-                          fontFamily: '"Fira code", "Fira Mono", monospace',
-                          fontSize: 14,
-                          outline: 'none',
-                          overflow: 'scroll'
-                        }}
-                      />
+                    <div className='border rounded-md overflow-y-auto' style={{height: '85vh'}}>
+                      <div className="relative bg-gray-900 text-white">
+                        <Editor
+                          value={editedContent}
+                          onValueChange={setEditedContent}
+                          highlight={code => highlight(code, prismLangInfo.prismLang, prismLangInfo.lang)}
+                          padding={10}
+                          className="w-full h-full"
+                          style={{
+                            fontFamily: '"Fira code", "Fira Mono", monospace',
+                            fontSize: 14,
+                            outline: 'none',
+                            overflow: 'scroll'
+                          }}
+                        />
+                      </div>
                     </div>
                   ) : (
                     <Textarea
@@ -347,9 +352,7 @@ export default function SharePage() {
                 <div className="flex flex-col">
                   <div className="flex justify-between items-center mb-2">
                     <h2 className="font-medium">预览</h2>
-                    <Button size="sm" variant="outline" onClick={refreshPreview}>
-                      <RefreshCw className="w-4 h-4 mr-1" /> 刷新
-                    </Button>
+                    <RefreshCw className="w-4 h-4 mr-1 cursor-pointer" onClick={refreshPreview} />
                   </div>
                   <div className="relative flex-1 border border-gray-300 rounded-lg min-h-[70vh]">
                     {isIframeLoading && (
