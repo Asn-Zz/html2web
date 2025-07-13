@@ -35,7 +35,7 @@ export default function SharePage() {
   const [error, setError] = useState('')
   const [cosService, setCosService] = useState<COSService | null>(null)
   const [isIframeLoading, setIsIframeLoading] = useState(true);
-  const [isVisitor, setIsVisitor] = useState(false);
+  const [isVisitor, setIsVisitor] = useState(true);
 
   // 刷新预览
   const refreshPreview = useCallback(() => {
@@ -73,7 +73,6 @@ export default function SharePage() {
         if (parsed.secretId && parsed.secretKey && parsed.bucket && parsed.region) {
           const service = new COSService(parsed)
           setCosService(service)
-          setIsVisitor(false)
         } else {
           setError('COS配置不完整，以游客模式预览。')
           fetchContentAsGuest();
@@ -102,7 +101,6 @@ export default function SharePage() {
       .then(data => {
         setContent(data)
         setEditedContent(data)
-        setIsVisitor(true)
       })
       .catch(error => {
         console.error('Failed to load file content as guest:', error)
@@ -116,6 +114,7 @@ export default function SharePage() {
   const toggleVisitor = () => {
     setContent('')
     setEditedContent('')
+    setIsVisitor(!isVisitor)
 
     if (isVisitor) {
       initServer()
@@ -260,7 +259,7 @@ export default function SharePage() {
           </div>
         )}
         {cosService && isVisitor && (
-          <div className="absolute bottom-2 right-2 z-10">
+          <div className="absolute bottom-4 right-4 z-10">
             <Button size="sm" variant="outline" onClick={toggleVisitor} disabled={isLoading}>
               <Save className="w-4 h-4 mr-1" /> 编辑
             </Button>

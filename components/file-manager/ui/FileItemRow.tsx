@@ -1,18 +1,19 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Download, Eye, Share2, Trash2 } from "lucide-react"
+import { Download, Edit, Share2, Trash2 } from "lucide-react"
 import type { FileItem } from "../types"
 import { formatFileSize, getFileIcon } from "../utils"
 
 interface FileItemRowProps {
   file: FileItem
   onItemClick: (item: FileItem) => void
+  onEdit: (item: FileItem) => void
   onShare: (item: FileItem) => void
   onDownload: (item: FileItem) => void
   onDelete: (item: FileItem) => void
 }
 
-export function FileItemRow({ file, onItemClick, onShare, onDownload, onDelete }: FileItemRowProps) {
+export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, onDelete }: FileItemRowProps) {
   return (
     <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => onItemClick(file)}>
       <CardContent className="p-4">
@@ -34,8 +35,8 @@ export function FileItemRow({ file, onItemClick, onShare, onDownload, onDelete }
           <div className="flex space-x-1 flex-shrink-0">
             {file.type === "file" && (
               <>
-                <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onItemClick(file); }} title="查看/编辑">
-                  <Eye className="w-4 h-4" />
+                <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onEdit(file); }} title="查看/编辑">
+                  <Edit className="w-4 h-4" />
                 </Button>
                 <Button size="sm" variant="ghost" onClick={(e) => { e.stopPropagation(); onDownload(file); }} title="下载">
                   <Download className="w-4 h-4" />

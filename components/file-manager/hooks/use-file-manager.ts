@@ -139,12 +139,12 @@ export function useFileManager() {
       const newPath = item.key.endsWith("/") ? item.key.slice(0, -1) : item.key
       setCurrentPath(newPath)
       if (cosService) await loadFiles(cosService, newPath)
-    } else {
-      await openFile(item)
+    } else {  
+      window.open(`/share/${encodeURIComponent(item.key)}`)
     }
   }
 
-  const openFile = async (file: FileItem) => {
+  const handleEdit = async (file: FileItem) => {
     if (!cosService) return
     setSelectedFile(file)
     setShowFileDetail(true)
@@ -308,6 +308,7 @@ export function useFileManager() {
     setSettings,
     refreshFiles,
     handleItemClick,
+    handleEdit,
     handleDelete,
     handleShare,
     handleDownload,

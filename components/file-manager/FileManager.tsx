@@ -39,6 +39,7 @@ export function FileManager() {
             onSortChange={hook.setSortBy}
             onViewModeChange={hook.setViewMode}
             onItemClick={hook.handleItemClick}
+            onEdit={hook.handleEdit}
             onShare={hook.handleShare}
             onDownload={hook.handleDownload}
             onDelete={hook.handleDelete}

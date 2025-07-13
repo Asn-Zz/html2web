@@ -16,6 +16,7 @@ interface FileBrowserProps {
   onSortChange: (value: string) => void
   onViewModeChange: (mode: "grid" | "list") => void
   onItemClick: (item: FileItem) => void
+  onEdit: (item: FileItem) => void
   onShare: (item: FileItem) => void
   onDownload: (item: FileItem) => void
   onDelete: (item: FileItem) => void
@@ -34,6 +35,7 @@ export function FileBrowser({
   onSortChange,
   onViewModeChange,
   onItemClick,
+  onEdit,
   onShare,
   onDownload,
   onDelete,
@@ -75,7 +77,7 @@ export function FileBrowser({
               variant={viewMode === "grid" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("grid")}
-              className="rounded-r-none"
+              className="rounded-r-none h-full"
             >
               <Grid3X3 className="w-4 h-4" />
             </Button>
@@ -83,7 +85,7 @@ export function FileBrowser({
               variant={viewMode === "list" ? "default" : "ghost"}
               size="sm"
               onClick={() => onViewModeChange("list")}
-              className="rounded-l-none"
+              className="rounded-l-none h-full"
             >
               <List className="w-4 h-4" />
             </Button>
@@ -100,6 +102,7 @@ export function FileBrowser({
                 key={file.key}
                 file={file}
                 onItemClick={onItemClick}
+                onEdit={onEdit}
                 onShare={onShare}
                 onDownload={onDownload}
                 onDelete={onDelete}
@@ -113,6 +116,7 @@ export function FileBrowser({
                 key={file.key}
                 file={file}
                 onItemClick={onItemClick}
+                onEdit={onEdit}
                 onShare={onShare}
                 onDownload={onDownload}
                 onDelete={onDelete}
