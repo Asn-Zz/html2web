@@ -10,8 +10,12 @@ export async function handler(request: NextRequest) {
 
   const cosUrl = `${process.env.NEXT_PUBLIC_COS_URL_PREFIX}/${key}`
 
-  try {
-    const response = await fetch(cosUrl)
+  try {    
+    const response = await fetch(cosUrl, {
+      headers: {
+        'Referer': request.headers.get('Referer') || '',
+      },
+    })
     
     if (!response.ok) {
       throw new Error(`Failed to fetch from COS: ${response.statusText}`)

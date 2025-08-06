@@ -91,7 +91,10 @@ export default function SharePage() {
   useEffect(initServer, [])
 
   const fetchContentAsGuest = () => {
-    fetch(`/api/cos-proxy?key=${encodeURIComponent(key)}`)
+    const query = window.location.href.split('?')[1]
+    const pathKey = key + (query ? `?${query}` : '')    
+    
+    fetch(`/api/cos-proxy?key=${encodeURIComponent(pathKey)}`)
       .then(response => {
         if (!response.ok) {
           throw new Error(`服务器错误: ${response.statusText}`);
