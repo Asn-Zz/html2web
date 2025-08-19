@@ -76,7 +76,7 @@ async function postHandler(request: NextRequest) {
         return NextResponse.json({ error: 'Cannot upload an empty file.' }, { status: 400 });
       }
       await cosService.uploadFile(key, buffer);
-      return NextResponse.json({ message: `File '${key}' uploaded successfully.` }, { status: 201 });
+      return NextResponse.json({ message: `${process.env.NEXT_PUBLIC_COS_URL_PREFIX}/${key}` }, { status: 201 });
     }
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
