@@ -71,7 +71,7 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
             </div>
           </div>
           {(fileType === "html" || fileType === "text") && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 flex-1 min-h-0">
+            <div className={`grid grid-cols-1 lg:grid-cols-${fileType === "html" ? 2 : 1} gap-6 flex-1 min-h-0`}>
               <div className="flex flex-col min-h-0">
                 <h4 className="font-medium mb-2">编辑器</h4>
                 {fileType === "html" ? (
@@ -95,19 +95,15 @@ export function FileDetailDialog({ isOpen, onOpenChange, selectedFile, editedCon
                   <Textarea className="flex-1 font-mono text-sm resize-none" value={editedContent} onChange={(e) => onContentChange(e.target.value)} />
                 )}
               </div>
-              <div className="flex flex-col">
-                <div className="flex justify-between items-center mb-2">
-                  <h4 className="font-medium">预览</h4>
-                  {fileType === "html" && <RefreshCw className="w-4 h-4 cursor-pointer" onClick={refreshPreview} />}
-                </div>
-                {fileType === "html" ? (
-                  <iframe ref={previewRef} className="flex-1 border border-gray-300 rounded-lg" title="预览" />
-                ) : (
-                  <div className="flex-1 bg-gray-100 border border-gray-300 rounded-lg p-4 flex items-center justify-center">
-                    <p className="text-gray-500">纯文本文件无预览。</p>
+              {fileType === "html" && (
+                <div className="flex flex-col">
+                  <div className="flex justify-between items-center mb-2">
+                    <h4 className="font-medium">预览</h4>
+                    <RefreshCw className="w-4 h-4 cursor-pointer" onClick={refreshPreview} />
                   </div>
-                )}
-              </div>
+                  <iframe ref={previewRef} className="flex-1 border border-gray-300 rounded-lg" title="预览" />
+                </div>
+              )}
             </div>
           )}
           {fileType === "image" && (

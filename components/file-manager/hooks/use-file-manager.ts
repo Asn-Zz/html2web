@@ -139,8 +139,10 @@ export function useFileManager() {
       const newPath = item.key.endsWith("/") ? item.key.slice(0, -1) : item.key
       setCurrentPath(newPath)
       if (cosService) await loadFiles(cosService, newPath)
-    } else {  
+    } else if (item.key.indexOf('html') > -1) {        
       window.open(`/share/${encodeURIComponent(item.key)}`)
+    } else {
+      handleEdit(item)
     }
   }
 
