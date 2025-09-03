@@ -12,7 +12,7 @@ export const preferredRegion = [
     "kix1",
 ];
 
-export async function GET(request: NextRequest) {
+async function handler(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const path = searchParams.getAll("file");
     searchParams.delete("file");
@@ -26,8 +26,19 @@ export async function GET(request: NextRequest) {
 
     try {      
         const response = await fetch(targetUrl);
-        return new NextResponse(response.body, response);
+        const headers = new Headers(response.headers);
+        headers.set('Access-Control-Allow-Origin', request.headers.get('origin') || '*');
+        headers.set('Access-Control-Allow-Methods', 'GET, OPTIONS');
+        headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+        
+        return new NextResponse(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers,
+        });
     } catch (error) {
         return NextResponse.json({ error: "Missing file or file not found." }, { status: 404 });
     }
 }
+
+export { handler as GET, handler as OPTIONS };
