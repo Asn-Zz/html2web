@@ -83,6 +83,7 @@ export function useFileManager() {
         size: 0,
         created: new Date(),
         path: path,
+        children: []
       }))
       const fileItems = result.files.map((file) => ({
         key: file.key,
@@ -95,12 +96,50 @@ export function useFileManager() {
         url: file.url,
       }))
       setFiles([...folders, ...fileItems])
+      if (folders.length) { await loadFolderFiles(service, path, folders, 1) }
     } catch (error) {
       console.error("Failed to load files:", error)
       toast({ title: "文件加载失败", description: error instanceof Error ? error.message : "未知错误", variant: "destructive" })
     } finally {
       setIsLoading(false)
     }
+  }
+
+  const loadFolderFiles = async (service: COSService, path: string, folders: FileItem[], depth: number) => {
+    const folderFiles = await Promise.all(folders.map((folder) => {      
+      const newPath = folder.key.endsWith("/") ? folder.key.slice(0, -1) : folder.key
+      return service.listFiles(newPath)
+    })) 
+
+    folders.forEach((folder, index) => {
+      const nestedFolders = folderFiles[index].folders.map((f) => ({
+        key: f.prefix,
+        name: f.name,
+        type: "folder" as const,
+        size: 0,
+        created: new Date(),
+        path: folder.key,
+        children: []
+      }));
+
+      if (nestedFolders.length > 0 && depth) {
+        loadFolderFiles(service, folder.key, nestedFolders, depth - 1);
+      }
+
+      folder.children = [
+        ...nestedFolders,
+        ...folderFiles[index].files.map((file) => ({
+          key: file.key,
+          name: file.name,
+          type: "file" as const,
+          size: file.size,
+          created: new Date(file.lastModified),
+          lastModified: new Date(file.lastModified),
+          path: path,
+          url: file.url,
+        })),
+      ];
+    })    
   }
 
   const refreshFiles = useCallback(() => {

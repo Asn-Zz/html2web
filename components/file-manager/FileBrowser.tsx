@@ -4,7 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ChevronRight, Folder, Grid3X3, Home, List, Plus } from "lucide-react"
 import type { FileItem } from "./types"
 import { FileItemCard } from "./ui/FileItemCard"
-import { FileItemRow } from "./ui/FileItemRow"
+import { FileTree } from "./ui/FileTree"
 import { FileAnalyze } from "./FileAnalyze"
 
 interface FileBrowserProps {
@@ -117,17 +117,14 @@ export function FileBrowser({
           </div>
         ) : (
           <div className="space-y-2">
-            {sortedFiles.map((file) => (
-              <FileItemRow
-                key={file.key}
-                file={file}
-                onItemClick={onItemClick}
-                onEdit={onEdit}
-                onShare={onShare}
-                onDownload={onDownload}
-                onDelete={onDelete}
-              />
-            ))}
+            <FileTree
+              files={sortedFiles}
+              onItemClick={onItemClick}
+              onEdit={onEdit}
+              onShare={onShare}
+              onDownload={onDownload}
+              onDelete={onDelete}
+            />
           </div>
         )
       ) : (

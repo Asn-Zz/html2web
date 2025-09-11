@@ -8,6 +8,7 @@ export interface FileItem {
   content?: string
   url?: string
   lastModified?: Date
+  children?: FileItem[]
 }
 
 export interface COSSettings {

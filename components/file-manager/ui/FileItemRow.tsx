@@ -1,4 +1,4 @@
-import { Card, CardContent } from "@/components/ui/card"
+
 import { Button } from "@/components/ui/button"
 import { Download, Edit, Share2, Trash2 } from "lucide-react"
 import type { FileItem } from "../types"
@@ -14,9 +14,10 @@ interface FileItemRowProps {
 }
 
 export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, onDelete }: FileItemRowProps) {
+  const isFolder = file.type === "folder" && !!file.children?.length
+
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => onItemClick(file)}>
-      <CardContent className="p-4">
+    <div className="cursor-pointer hover:shadow-md transition-shadow p-4" onClick={() => onItemClick(file)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 overflow-hidden">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -24,7 +25,7 @@ export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, on
             </div>
             <div className="overflow-hidden">
               <h3 className="font-semibold text-gray-900 truncate" title={file.name}>
-                {file.name}
+                {file.name} {isFolder && `(${file.children?.length})`}
               </h3>
               <p className="text-sm text-gray-500">
                 {file.type === "file" && `${formatFileSize(file.size)} • `}
@@ -51,7 +52,6 @@ export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, on
             </Button>
           </div>
         </div>
-      </CardContent>
-    </Card>
+    </div>
   )
 }

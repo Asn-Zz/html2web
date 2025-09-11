@@ -30,6 +30,7 @@ export function FileItemCard({ file, onItemClick, onEdit, onShare, onDownload, o
                 {file.name}
               </h3>
               {file.type === "file" && <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>}
+              {file.type === "folder" && <p className="text-sm text-gray-500">({file.children?.length})</p>}
             </div>
           </div>
         </div>
