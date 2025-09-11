@@ -5,6 +5,7 @@ import { ChevronRight, Folder, Grid3X3, Home, List, Plus } from "lucide-react"
 import type { FileItem } from "./types"
 import { FileItemCard } from "./ui/FileItemCard"
 import { FileItemRow } from "./ui/FileItemRow"
+import { FileAnalyze } from "./FileAnalyze"
 
 interface FileBrowserProps {
   sortedFiles: FileItem[]
@@ -43,20 +44,25 @@ export function FileBrowser({
 }: FileBrowserProps) {
   return (
     <>
-      {/* Breadcrumbs */}
-      <div className="mb-4 flex items-center space-x-2 text-sm text-gray-600">
-        {breadcrumbs.map((crumb, index) => (
-          <div key={crumb.path} className="flex items-center">
-            <button
-              onClick={() => onNavigate(crumb.path)}
-              className="hover:text-blue-600 cursor-pointer flex items-center"
-            >
-              {index === 0 ? <Home className="w-4 h-4" /> : crumb.name}
-            </button>
-            {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />}
-          </div>
-        ))}
+      {/* Breadcrumbs & Analyze */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center space-x-2 text-sm text-gray-600">
+          {breadcrumbs.map((crumb, index) => (
+              <div key={crumb.path} className="flex items-center">
+              <button
+                onClick={() => onNavigate(crumb.path)}
+                className="hover:text-blue-600 cursor-pointer flex items-center"
+              >
+                {index === 0 ? <Home className="w-4 h-4" /> : crumb.name}
+              </button>
+              {index < breadcrumbs.length - 1 && <ChevronRight className="w-4 h-4 mx-2 text-gray-400" />}
+            </div>
+          ))}
+        </div>
+
+        <FileAnalyze />
       </div>
+
 
       {/* File List Header */}
       <div className="flex justify-between items-center mb-6">
