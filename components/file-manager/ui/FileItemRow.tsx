@@ -15,10 +15,9 @@ interface FileItemRowProps {
 
 export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, onDelete }: FileItemRowProps) {
   const isFolder = file.type === "folder" && !!file.children?.length
-  const folderSize = file.children?.map((item) => item.size).reduce((a, b) => a + b, 0) || 0
 
   return (
-    <div className="cursor-pointer hover:shadow-md transition-shadow p-4" onClick={() => onItemClick(file)}>
+    <div className="cursor-pointer border-b hover:border-b-1 hover:border-b-blue-500 p-4" onClick={() => onItemClick(file)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4 overflow-hidden">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -29,8 +28,7 @@ export function FileItemRow({ file, onItemClick, onEdit, onShare, onDownload, on
                 {file.name} {isFolder && `(${file.children?.length})`}
               </h3>
               <p className="text-sm text-gray-500">
-                {file.type === "file" && `${formatFileSize(file.size)} • `}
-                {file.type === "folder" && `${formatFileSize(folderSize)} • `}
+                {`${formatFileSize(file.size)} • `}
                 {file.created.toLocaleDateString()}
               </p>
             </div>

@@ -133,6 +133,7 @@ export function useFileManager() {
         loadFolderFiles(service, folder.key, nestedFolders, depth - 1);
       }
 
+      folder.size = folderFiles[index].files.reduce((total, file) => total + file.size, 0);
       folder.children = [
         ...nestedFolders,
         ...folderFiles[index].files.map((file) => ({
@@ -156,7 +157,6 @@ export function useFileManager() {
   }, [cosService, currentPath])
 
   const sortedFiles = [...files].sort((a, b) => {
-    if (a.type !== b.type) return a.type === "folder" ? -1 : 1
     switch (sortBy) {
       case "name":
         return a.name.localeCompare(b.name)
