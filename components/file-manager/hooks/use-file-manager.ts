@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { COSService } from "@/lib/cos-service"
 import type { COSSettings, FileItem } from "../types"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { getFileType } from "../utils"
 
 export function useFileManager() {
@@ -34,12 +34,11 @@ export function useFileManager() {
   })
 
   const { toast } = useToast()
-  const params = useSearchParams()
   const initializeCOS = useCallback(
     async (cosSettings: COSSettings) => {
       try {
         const service = new COSService(cosSettings)
-        const path = params.get("path") || ""
+        const path = new URLSearchParams(window.location.search).get("path") || ""
         setCosService(service)
         setIsInitialized(true)
         setCurrentPath(path)
