@@ -70,7 +70,7 @@ export function useFileManager() {
   }, [initializeCOS, toast])
 
   const router = useRouter()
-  useEffect(() => {
+  useEffect(() => {    
     router.replace(`?path=${encodeURIComponent(currentPath)}`)
   }, [currentPath])
 
@@ -155,6 +155,50 @@ export function useFileManager() {
       loadFiles(cosService, currentPath)
     }
   }, [cosService, currentPath])
+
+  useEffect(() => {
+    if (!cosService) { return }
+
+    const handlePaste = async (event: ClipboardEvent) => {
+      const pastedText = event.clipboardData?.getData('text');
+      const urlRegex = /^(https|http):\/\/[^\s/$.?#].[^\s]*$/i;
+
+      try {
+        const path = new URLSearchParams(window.location.search).get("path") || ""
+
+        if (pastedText && urlRegex.test(pastedText)) {
+          if (!window.confirm('检测到链接，是否要上传文件？')) { return }
+
+          const response = await fetch(pastedText)
+          const blob = await response.blob()
+          const file = new File([blob], pastedText.split('/').pop() || 'image.jpg', { type: blob.type });
+
+          await cosService?.uploadFile(`${path}/${file.name}`, file)
+        } else if (event.clipboardData?.files.length) {
+          const files = Array.from(event.clipboardData.files)
+          if (!window.confirm(`检测到${files.length}个文件，是否要上传？`)) { return }
+
+          const uploadPromises = files.map(async (file) => {
+            const key = `${path}/${file.name}`
+            await cosService?.uploadFile(key, file)
+          })
+
+          await Promise.all(uploadPromises)
+        }    
+
+        toast({ title: '保存成功', description: `文件已保存` })
+        loadFiles(cosService, path)
+      } catch (error) {
+        console.error('Failed to upload file:', error)
+        toast({ title: '保存失败', description: error instanceof Error ? error.message : '未知错误', variant: 'destructive' })
+      }
+    }
+    
+    document.addEventListener("paste", handlePaste)
+    return () => {
+      document.removeEventListener("paste", handlePaste)
+    }
+  }, [cosService])
 
   const sortedFiles = [...files].sort((a, b) => {
     switch (sortBy) {
