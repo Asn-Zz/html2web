@@ -14,6 +14,9 @@ interface FileItemCardProps {
 }
 
 export function FileItemCard({ file, onItemClick, onEdit, onShare, onDownload, onDelete }: FileItemCardProps) {
+  const isFolder = file.type === "folder"
+  const folderSize = file.children?.map((item) => item.size).reduce((a, b) => a + b, 0) || 0
+  
   return (
     <Card
       className="cursor-pointer hover:shadow-lg transition-all duration-200 hover:-translate-y-1"
@@ -27,10 +30,10 @@ export function FileItemCard({ file, onItemClick, onEdit, onShare, onDownload, o
             </div>
             <div className="overflow-hidden">
               <h3 className="font-semibold text-gray-900 truncate" title={file.name}>
-                {file.name}
+                {file.name} {isFolder && `(${file.children?.length})`}
               </h3>
               {file.type === "file" && <p className="text-sm text-gray-500">{formatFileSize(file.size)}</p>}
-              {file.type === "folder" && <p className="text-sm text-gray-500">({file.children?.length})</p>}
+              {file.type === "folder" && <p className="text-sm text-gray-500">{formatFileSize(folderSize)}</p>}
             </div>
           </div>
         </div>

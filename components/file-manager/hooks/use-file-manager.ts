@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react"
 import { useToast } from "@/hooks/use-toast"
 import { COSService } from "@/lib/cos-service"
 import type { COSSettings, FileItem } from "../types"
+import { useRouter, useSearchParams } from "next/navigation"
 import { getFileType } from "../utils"
 
 export function useFileManager() {
@@ -33,14 +34,16 @@ export function useFileManager() {
   })
 
   const { toast } = useToast()
-
+  const params = useSearchParams()
   const initializeCOS = useCallback(
     async (cosSettings: COSSettings) => {
       try {
         const service = new COSService(cosSettings)
+        const path = params.get("path") || ""
         setCosService(service)
         setIsInitialized(true)
-        await loadFiles(service, "")
+        setCurrentPath(path)
+        await loadFiles(service, path)
       } catch (error) {
         console.error("Failed to initialize COS:", error)
         toast({ title: "COS初始化失败", description: "请检查配置信息是否正确", variant: "destructive" })
@@ -66,6 +69,11 @@ export function useFileManager() {
       }
     }
   }, [initializeCOS, toast])
+
+  const router = useRouter()
+  useEffect(() => {
+    router.replace(`?path=${encodeURIComponent(currentPath)}`)
+  }, [currentPath])
 
   const loadFiles = async (service: COSService, path: string) => {
     if (!service) {
