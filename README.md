@@ -1,19 +1,43 @@
 # HTML2Web - 基于 Next.js 和腾讯云 COS 的文件管理器
 
-这是一个功能完善、界面现代的 Web 文件管理器。它使用 Next.js 构建，并深度集成了腾讯云对象存储（COS），为您提供了一个私有、高效、可扩展的云存储解决方案。
+这是一个功能完善、界面现代的 Web 文件管理器。它使用 Next.js 构建，并深度集成了腾讯云对象存储（COS），为您提供了一个私有、高效、可扩展的云存储解决方案，同时支持 Restful 接口层级调用。
 
 ![应用截图](public/placeholder.png)
 
+<details>
+<summary>编辑器截图</summary>
+<img src="public/placeholder-dialog.png" alt="编辑器截图">
+<img src="public/placeholder-edit.png" alt="编辑器截图">
+</details>
+
+<details>
+<summary>接口调用格式</summary>
+
+```javascript
+/**
+ * GET/POST/DELETE /api/cos/files/[...key]
+ * - To list contents: ?type=folder
+ * - To download a file: ?type=file (or omit type)
+ * - header Authorization: your_token
+ */
+
+/**
+ * GET /api/static/[...file]
+ * - To get a file
+ */
+```
+</details>
+
 ## ✨ 主要功能
 
-- **文件和文件夹管理**: 支持完整的 CRUD (创建、读取、更新、删除) 操作。
-- **文件上传**: 支持拖拽上传和选择文件上传，带进度显示。
+- **文件和文件夹管理**: 支持完整的 CRUD (创建、读取、删除) 操作。
+- **文件上传**: 支持复制链接/文件、拖拽上传和选择文件上传。
 - **文件下载**: 单文件下载和多文件打包下载。
 - **在线预览**: 支持图片、文本等常见文件类型的在线预览。
-- **文件分享**: 生成文件的分享链接，可设置有效期和密码。
+- **文件分享**: 生成文件的分享链接，可设置有效期和密码(待定)。
 - **响应式设计**: 在桌面和移动设备上均有良好的使用体验。
 - **可配置性**: 通过环境变量轻松配置腾讯云 COS 信息。
-- **深色模式**: 支持浅色和深色两种主题模式。
+- **调用统计**: 支持调用统计，可查看调用次数和调用时间。
 
 ## 🚀 技术栈
 
@@ -109,7 +133,3 @@ yarn dev
 ##🤝 贡献
 
 欢迎任何形式的贡献！如果您有任何建议或发现任何问题，请随时提交 Pull Request 或创建 Issue。
-
-## 📄 许可证
-
-本项目采用 [MIT License](LICENSE) 授权。

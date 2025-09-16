@@ -1,5 +1,6 @@
 "use client"
 
+import dynamic from 'next/dynamic';
 import { useFileManager } from "./hooks/use-file-manager"
 import { Header } from "./Header"
 import { FileBrowser } from "./FileBrowser"
@@ -10,11 +11,13 @@ import { ShareDialog } from "./dialogs/ShareDialog"
 import { LoadingOverlay } from "./ui/LoadingOverlay"
 import { UninitializedState } from "./ui/UninitializedState"
 
+const FileCanvas = dynamic(() => import('./ui/FileCanvas'), { ssr: false });
+
 export function FileManager() {
   const hook = useFileManager()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen">
       <LoadingOverlay isLoading={hook.isLoading} />
 
       <Header
@@ -110,6 +113,8 @@ export function FileManager() {
         shareUrl={hook.shareUrl}
         fileKey={hook.selectedFile?.key}
       />
+
+      <FileCanvas />
     </div>
   )
 }
