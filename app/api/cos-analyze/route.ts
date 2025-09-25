@@ -19,10 +19,11 @@ export async function handler(request: NextRequest) {
   const client = new BillingClient(clientConfig);
   const day = new Date().toISOString().split('T')[0];
   const params = {
-      StartDate: day.replace(day.split('-').pop() || '', '01'),
+      StartDate: day.replace(/.{2}$/, '01'),
       EndDate: day,
       BucketName: process.env.NEXT_PUBLIC_COS_BUCKET
-  };
+  };  
+  
   const result = await client.DescribeDosageCosDetailByDate(params as any)
   return new NextResponse(JSON.stringify(result), {
     status: 200,
