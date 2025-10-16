@@ -165,8 +165,12 @@ export function useFileManager() {
 
       try {
         const path = new URLSearchParams(window.location.search).get("path") || ""
-
-        if (pastedText && isFileUrl) {
+        const reloadFiles = () => {
+          toast({ title: '保存成功', description: `文件已保存` })
+          loadFiles(cosService, path)
+        }
+          
+        if (pastedText && isFileUrl) {          
           if (!window.confirm('检测到链接，是否要上传文件？')) { return }
 
           const response = await fetch(pastedText)
@@ -174,6 +178,7 @@ export function useFileManager() {
           const file = new File([blob], pastedText.split('/').pop() || 'image.jpg', { type: blob.type });
 
           await cosService?.uploadFile(`${path}/${file.name}`, file)
+          reloadFiles()
         } else if (event.clipboardData?.files.length) {
           const files = Array.from(event.clipboardData.files)
           if (!window.confirm(`检测到${files.length}个文件，是否要上传？`)) { return }
@@ -184,10 +189,8 @@ export function useFileManager() {
           })
 
           await Promise.all(uploadPromises)
+          reloadFiles()
         }    
-
-        toast({ title: '保存成功', description: `文件已保存` })
-        loadFiles(cosService, path)
       } catch (error) {
         console.error('Failed to upload file:', error)
         toast({ title: '保存失败', description: error instanceof Error ? error.message : '未知错误', variant: 'destructive' })
