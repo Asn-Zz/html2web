@@ -161,12 +161,12 @@ export function useFileManager() {
 
     const handlePaste = async (event: ClipboardEvent) => {
       const pastedText = event.clipboardData?.getData('text');
-      const urlRegex = /^(https|http):\/\/[^\s/$.?#].[^\s]*$/i;
+      const isFileUrl = pastedText?.startsWith("http") && pastedText.split('/').pop()?.includes(".");
 
       try {
         const path = new URLSearchParams(window.location.search).get("path") || ""
 
-        if (pastedText && urlRegex.test(pastedText)) {
+        if (pastedText && isFileUrl) {
           if (!window.confirm('检测到链接，是否要上传文件？')) { return }
 
           const response = await fetch(pastedText)
